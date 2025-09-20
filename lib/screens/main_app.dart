@@ -18,8 +18,7 @@ class _MainAppState extends State<MainApp> {
   final List<Widget> screens = [
     const CalculatorScreen(),
     const HistoryScreen(),
-    const ConverterScreen(), // You'll need to create this
-    // const GraphScreen(), // You'll need to create this
+    const ConverterScreen(), 
   ];
 
   @override

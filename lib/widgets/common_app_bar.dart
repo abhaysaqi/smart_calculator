@@ -9,14 +9,14 @@ class CommonHeader extends StatelessWidget {
   final Color? iconColor;
 
   const CommonHeader({
-    Key? key,
+    super.key,
     required this.title,
     this.onSettingsTap,
     this.showSettings = true,
     this.backgroundColor,
     this.textColor,
     this.iconColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
