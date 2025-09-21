@@ -5,11 +5,11 @@ class AppStrings {
   static const String history = 'History';
   static const String converter = 'Converter';
   static const String graph = 'Graph';
-  
+
   // Calculator display
   static const String sampleCalculation = '1,234 + 5,678';
   static const String sampleResult = '6,912';
-  
+
   // Button labels
   static const String clear = 'C';
   static const String plusMinus = '±';
@@ -20,7 +20,7 @@ class AppStrings {
   static const String add = '+';
   static const String equals = '=';
   static const String decimal = '.';
-  
+
   // Numbers
   static const String zero = '0';
   static const String one = '1';
@@ -32,4 +32,6 @@ class AppStrings {
   static const String seven = '7';
   static const String eight = '8';
   static const String nine = '9';
+
+  static const String removx = '⌫';
 }
