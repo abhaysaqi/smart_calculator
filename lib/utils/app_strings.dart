@@ -33,5 +33,5 @@ class AppStrings {
   static const String eight = '8';
   static const String nine = '9';
 
-  static const String removx = '⌫';
+  static const String remove = '⌫';
 }
