@@ -1529,8 +1529,13 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     }
   }
 
+  // Enhanced Voice Input Methods
+  // Enhanced Voice Input Methods with better error handling
   void _startListening() async {
-    if (!_speechEnabled) return;
+    if (!_speechEnabled) {
+      _showSpeechError('Speech recognition not enabled');
+      return;
+    }
 
     setState(() {
       _isListening = true;
@@ -1543,7 +1548,19 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     HapticFeedback.mediumImpact();
 
     await _speechService.startListening(
-      onResult: (recognizedText) {
+      onResult: (recognizedText, shouldAutoCalculate) {
+        print(
+          '📱 Received: "$recognizedText" (auto-calc: $shouldAutoCalculate)',
+        );
+
+        if (recognizedText == 'CLEAR_ALL') {
+          // Handle clear command
+          _clearAll();
+          _stopListening();
+          _showSuccessMessage('Calculator cleared by voice');
+          return;
+        }
+
         if (recognizedText.isNotEmpty) {
           setState(() {
             _speechText = recognizedText;
@@ -1551,12 +1568,37 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             calculation = recognizedText;
             _isCalculated = false;
           });
+
           _evaluateLiveResult();
+
+          // Auto-calculate complete expressions (no need to say "equals")
+          if (shouldAutoCalculate) {
+            Future.delayed(const Duration(milliseconds: 800), () {
+              if (mounted && calculation == recognizedText) {
+                _calculate();
+                _stopListening();
+              }
+            });
+          }
         }
       },
       onError: (error) {
         _stopListening();
-        _showSpeechError(error);
+        // Only show user-friendly errors, not technical ones
+        if (error.contains('permission')) {
+          _showSpeechError('Microphone permission required');
+        } else if (error.contains('not available')) {
+          _showSpeechError('Speech recognition not available');
+        } else {
+          // For other errors, just show a generic message
+          _showSpeechError('Speech recognition temporarily unavailable');
+        }
+      },
+      onTimeout: () {
+        // This is called when auto-timeout occurs (normal behavior)
+        _stopListening();
+        // Don't show error for normal timeout
+        print('🔇 Voice input completed (timeout)');
       },
     );
   }
@@ -1574,15 +1616,44 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     _pulseAnimationController.stop();
 
     HapticFeedback.lightImpact();
+  }
 
-    // Auto-calculate if we have a valid expression ending with "equals"
-    if (_speechText.toLowerCase().contains('equal') ||
-        _speechText.toLowerCase().contains('is') ||
-        _speechText.toLowerCase().endsWith('=')) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _calculate();
-      });
-    }
+  // Remove the _showVoiceTimeout method since normal timeouts shouldn't show error messages
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white, size: 16),
+            const SizedBox(width: 8),
+            Text(message),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showVoiceTimeout() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.timer_off, color: Colors.white, size: 16),
+            const SizedBox(width: 8),
+            const Text('Voice input stopped (timeout)'),
+          ],
+        ),
+        backgroundColor: Colors.orange,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   void _showVoiceHelp() {
