@@ -1,224 +1,6 @@
-// import 'package:speech_to_text/speech_to_text.dart' as stt;
-// import 'package:speech_to_text/speech_recognition_result.dart';
-
-// class SpeechService {
-//   static final SpeechService _instance = SpeechService._internal();
-//   factory SpeechService() => _instance;
-//   SpeechService._internal();
-
-//   late stt.SpeechToText _speechToText;
-//   bool _isInitialized = false;
-//   bool _isListening = false;
-
-//   bool get isInitialized => _isInitialized;
-//   bool get isListening => _isListening;
-
-//   Future<bool> initialize() async {
-//     if (_isInitialized) return true;
-
-//     _speechToText = stt.SpeechToText();
-//     _isInitialized = await _speechToText.initialize(
-//       onStatus: (status) => print('Speech status: $status'),
-//       onError: (error) => print('Speech error: $error'),
-//     );
-
-//     return _isInitialized;
-//   }
-
-//   Future<void> startListening({
-//     required Function(String) onResult,
-//     required Function(String) onError,
-//   }) async {
-//     if (!_isInitialized) {
-//       await initialize();
-//     }
-
-//     if (_isInitialized && !_isListening) {
-//       _isListening = true;
-//       await _speechToText.listen(
-//         onResult: (result) {
-//           onResult(_processVoiceInput(result.recognizedWords));
-//         },
-//         listenFor: const Duration(seconds: 10),
-//         pauseFor: const Duration(seconds: 3),
-//         partialResults: true,
-//         localeId: 'en_US',
-//         listenMode: stt.ListenMode.confirmation,
-//       );
-//     }
-//   }
-
-//   Future<void> stopListening() async {
-//     if (_isListening) {
-//       _isListening = false;
-//       await _speechToText.stop();
-//     }
-//   }
-
-//   Future<void> cancelListening() async {
-//     if (_isListening) {
-//       _isListening = false;
-//       await _speechToText.cancel();
-//     }
-//   }
-
-//   // Convert voice input to mathematical expression
-//   String _processVoiceInput(String voiceText) {
-//     String processed = voiceText.toLowerCase().trim();
-
-//     // Replace number words with digits
-//     processed = _replaceNumberWords(processed);
-
-//     // Replace operator words with symbols
-//     processed = _replaceOperatorWords(processed);
-
-//     // Clean up the expression
-//     processed = _cleanExpression(processed);
-
-//     return processed;
-//   }
-
-//   String _replaceNumberWords(String text) {
-//     final numberMap = {
-//       'zero': '0',
-//       'one': '1',
-//       'two': '2',
-//       'three': '3',
-//       'four': '4',
-//       'five': '5',
-//       'six': '6',
-//       'seven': '7',
-//       'eight': '8',
-//       'nine': '9',
-//       'ten': '10',
-//       'eleven': '11',
-//       'twelve': '12',
-//       'thirteen': '13',
-//       'fourteen': '14',
-//       'fifteen': '15',
-//       'sixteen': '16',
-//       'seventeen': '17',
-//       'eighteen': '18',
-//       'nineteen': '19',
-//       'twenty': '20',
-//       'thirty': '30',
-//       'forty': '40',
-//       'fifty': '50',
-//       'sixty': '60',
-//       'seventy': '70',
-//       'eighty': '80',
-//       'ninety': '90',
-//       'hundred': '100',
-//       'thousand': '1000',
-//     };
-
-//     String result = text;
-//     numberMap.forEach((word, digit) {
-//       result = result.replaceAll(RegExp('\\b$word\\b'), digit);
-//     });
-
-//     return result;
-//   }
-
-//   String _replaceOperatorWords(String text) {
-//     final operatorMap = {
-//       // Addition
-//       'plus': '+', 'add': '+', 'added to': '+', 'sum': '+', 'total': '+',
-
-//       // Subtraction
-//       'minus': '−', 'subtract': '−', 'take away': '−', 'less': '−',
-//       'difference': '−', 'subtract from': '−',
-
-//       // Multiplication
-//       'times': '×', 'multiply': '×', 'multiplied by': '×', 'into': '×',
-//       'product': '×', 'of': '×',
-
-//       // Division
-//       'divide': '÷', 'divided by': '÷', 'over': '÷', 'quotient': '÷',
-
-//       // Others
-//       'percent': '%', 'percentage': '%',
-//       'point': '.', 'decimal': '.',
-//       'equals': '=', 'equal': '=', 'is': '=', 'result': '=',
-//     };
-
-//     String result = text;
-//     operatorMap.forEach((word, symbol) {
-//       result = result.replaceAll(RegExp('\\b$word\\b'), symbol);
-//     });
-
-//     return result;
-//   }
-
-//   String _cleanExpression(String text) {
-//     // Remove common filler words
-//     final fillerWords = ['the', 'a', 'an', 'and', 'to', 'by', 'from', 'with'];
-//     String result = text;
-
-//     for (String word in fillerWords) {
-//       result = result.replaceAll(RegExp('\\b$word\\b'), '');
-//     }
-
-//     // Clean up spaces
-//     result = result.replaceAll(RegExp(r'\s+'), ' ').trim();
-
-//     // Remove spaces around operators
-//     result = result.replaceAll(RegExp(r'\s*([+\-×÷%=.])\s*'), r'$1');
-
-//     // Handle special cases like "twenty five" -> "25"
-//     result = _handleCompoundNumbers(result);
-
-//     return result;
-//   }
-
-//   String _handleCompoundNumbers(String text) {
-//     // Handle compound numbers like "twenty five" -> "25"
-//     final patterns = {
-//       RegExp(r'20\s*1'): '21',
-//       RegExp(r'20\s*2'): '22',
-//       RegExp(r'20\s*3'): '23',
-//       RegExp(r'20\s*4'): '24',
-//       RegExp(r'20\s*5'): '25',
-//       RegExp(r'20\s*6'): '26',
-//       RegExp(r'20\s*7'): '27',
-//       RegExp(r'20\s*8'): '28',
-//       RegExp(r'20\s*9'): '29',
-//       RegExp(r'30\s*1'): '31',
-//       RegExp(r'30\s*2'): '32',
-//       RegExp(r'30\s*3'): '33',
-//       RegExp(r'30\s*4'): '34',
-//       RegExp(r'30\s*5'): '35',
-//       RegExp(r'30\s*6'): '36',
-//       RegExp(r'30\s*7'): '37',
-//       RegExp(r'30\s*8'): '38',
-//       RegExp(r'30\s*9'): '39',
-//       // Add more patterns as needed
-//     };
-
-//     String result = text;
-//     patterns.forEach((pattern, replacement) {
-//       result = result.replaceAll(pattern, replacement);
-//     });
-
-//     return result;
-//   }
-
-//   List<String> getExampleCommands() {
-//     return [
-//       "Five plus three",
-//       "Ten minus two",
-//       "Six times seven",
-//       "Twenty divided by four",
-//       "Fifty percent of hundred",
-//       "Two point five plus one point five",
-//     ];
-//   }
-// }
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:speech_to_text/speech_recognition_result.dart';
 
 class SpeechService {
   static final SpeechService _instance = SpeechService._internal();
@@ -231,11 +13,8 @@ class SpeechService {
   Timer? _silenceTimer;
   Timer? _autoTimeoutTimer;
 
-  // Simplified configuration - focus on keeping it listening longer
-  static const Duration _silenceTimeout = Duration(seconds: 10); // Much longer
-  static const Duration _maxListeningDuration = Duration(
-    seconds: 30,
-  ); // Much longer
+  static const Duration _silenceTimeout = Duration(seconds: 10);
+  static const Duration _maxListeningDuration = Duration(seconds: 30);
 
   bool get isInitialized => _isInitialized;
   bool get isListening => _isListening;
@@ -247,12 +26,10 @@ class SpeechService {
     _isInitialized = await _speechToText.initialize(
       onStatus: (status) {
         print('🔊 Speech status: $status');
-        // IGNORE "notListening" and "done" status - let our timers handle it
-        // This prevents Android from closing too early
       },
       onError: (error) {
         print('❌ Speech error: ${error.errorMsg}');
-        // Only handle permanent errors
+
         if (error.permanent && error.errorMsg != 'error_no_match') {
           _handleSpeechEnd();
         }
@@ -274,10 +51,8 @@ class SpeechService {
     if (_isInitialized && !_isListening) {
       _isListening = true;
 
-      // Cancel any existing timers
       _cancelAllTimers();
 
-      // Start our own timeout timer (ignore speech recognizer's timeout)
       _autoTimeoutTimer = Timer(_maxListeningDuration, () {
         print('⏰ Our timeout reached (${_maxListeningDuration.inSeconds}s)');
         _stopListeningWithTimeout(onTimeout);
@@ -290,7 +65,6 @@ class SpeechService {
               '🎤 Speech: "${result.recognizedWords}" (confidence: ${result.confidence})',
             );
 
-            // Reset our silence timer whenever we get ANY result
             _resetOurSilenceTimer(onTimeout);
 
             if (result.recognizedWords.isNotEmpty) {
@@ -302,10 +76,9 @@ class SpeechService {
               );
               onResult(processedText, shouldAutoCalculate);
 
-              // If it's a complete expression and final result, auto-calculate
               if (result.finalResult && shouldAutoCalculate) {
                 print('🎯 Final complete expression - will auto-calculate');
-                // Give a small delay then stop
+
                 Timer(const Duration(milliseconds: 500), () {
                   if (_isListening) {
                     _stopListeningWithTimeout(onTimeout);
@@ -314,19 +87,16 @@ class SpeechService {
               }
             }
           },
-          // AGGRESSIVE SETTINGS - Force it to listen longer
-          listenFor: const Duration(seconds: 30), // Maximum time
-          pauseFor: const Duration(seconds: 15), // VERY long pause tolerance
+
+          listenFor: const Duration(seconds: 30),
+          pauseFor: const Duration(seconds: 15),
           partialResults: true,
           localeId: 'en_US',
-          listenMode: stt
-              .ListenMode
-              .dictation, // Changed from confirmation to dictation
+          listenMode: stt.ListenMode.dictation,
           cancelOnError: false,
           onDevice: false,
         );
 
-        // Start our own silence timer
         _startOurSilenceTimer(onTimeout);
 
         print(
@@ -340,7 +110,6 @@ class SpeechService {
     }
   }
 
-  // Our own silence timer - ignores speech recognizer status
   void _startOurSilenceTimer(VoidCallback onTimeout) {
     _silenceTimer?.cancel();
     print('⏰ Starting OUR silence timer (${_silenceTimeout.inSeconds}s)');
@@ -355,7 +124,7 @@ class SpeechService {
   void _resetOurSilenceTimer(VoidCallback onTimeout) {
     _silenceTimer?.cancel();
     print('🔄 OUR silence timer reset - speech detected');
-    // Restart the silence timer
+
     _startOurSilenceTimer(onTimeout);
   }
 
@@ -399,7 +168,6 @@ class SpeechService {
 
     String clean = expression.replaceAll(' ', '');
 
-    // Only auto-calculate if it's a complete expression
     RegExp completeExpression = RegExp(r'^\d+(\.\d+)?[+\-×÷%]\d+(\.\d+)?$');
     if (completeExpression.hasMatch(clean)) {
       print('✅ Complete expression: "$clean"');
@@ -486,7 +254,6 @@ class SpeechService {
   String _convertWordsToMath(String text) {
     String result = text;
 
-    // Remove question phrases
     final questionPhrases = [
       'what is ',
       'what\'s ',
@@ -505,7 +272,6 @@ class SpeechService {
       result = result.replaceAll(phrase, '');
     }
 
-    // Convert compound numbers first
     final compoundNumbers = {
       'twenty one': '21',
       'twenty two': '22',
@@ -531,7 +297,6 @@ class SpeechService {
       result = result.replaceAll(entry.key, entry.value);
     }
 
-    // Convert individual numbers
     final individualNumbers = {
       'zero': '0',
       'one': '1',
@@ -580,7 +345,6 @@ class SpeechService {
       }
     }
 
-    // Convert operators - SIMPLE DIRECT REPLACEMENTS
     result = result.replaceAll(' plus ', '+');
     result = result.replaceAll(' add ', '+');
     result = result.replaceAll(' minus ', '−');
@@ -591,7 +355,6 @@ class SpeechService {
     result = result.replaceAll(' divide ', '÷');
     result = result.replaceAll(' over ', '÷');
 
-    // Handle boundary cases
     if (result.endsWith(' plus')) result = result.replaceAll(' plus', '+');
     if (result.endsWith(' add')) result = result.replaceAll(' add', '+');
     if (result.endsWith(' minus')) result = result.replaceAll(' minus', '−');
@@ -610,7 +373,6 @@ class SpeechService {
     if (result.startsWith('multiply '))
       result = result.replaceAll('multiply ', '×');
 
-    // Clean up spaces
     while (result.contains('  ')) {
       result = result.replaceAll('  ', ' ');
     }
@@ -624,7 +386,7 @@ class SpeechService {
       "Five minus one",
       "Four times six",
       "Ten divided by two",
-      "Three minus... (pause) ...two", // Now supported!
+      "Three minus... (pause) ...two",
       "Clear all",
     ];
   }
