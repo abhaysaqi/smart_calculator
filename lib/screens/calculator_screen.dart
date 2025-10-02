@@ -968,6 +968,8 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     );
 
     return Scaffold(
+      floatingActionButton: _buildVoiceButton(buttonHeight, screenWidth, false),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       body: SafeArea(
         child: Container(
           decoration: const BoxDecoration(
@@ -1399,10 +1401,10 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
           ], buttonSpacing),
 
-          // Row 6: Voice Button
-          _buildResponsiveButtonRow([
-            _buildVoiceButton(buttonHeight, screenWidth, isTablet),
-          ], buttonSpacing),
+          // // Row 6: Voice Button
+          // _buildResponsiveButtonRow([
+          //   _buildVoiceButton(buttonHeight, screenWidth, isTablet),
+          // ], buttonSpacing),
         ],
       ),
     );
@@ -1413,72 +1415,57 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     double screenWidth,
     bool isTablet,
   ) {
-    return Expanded(
-      child: AnimatedBuilder(
-        animation: _micScaleAnimation,
-        child: GestureDetector(
-          onTap: _speechEnabled ? _toggleListening : _showSpeechUnavailable,
-          onLongPress: _speechEnabled ? _showVoiceHelp : null,
-          child: Container(
-            height: buttonHeight,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: _isListening
-                    ? [Colors.red.withOpacity(0.8), Colors.red.withOpacity(0.6)]
-                    : _speechEnabled
-                    ? [
-                        AppColors.primaryColor.withOpacity(0.8),
-                        AppColors.textPurple.withOpacity(0.8),
-                      ]
-                    : [
-                        Colors.grey.withOpacity(0.5),
-                        Colors.grey.withOpacity(0.3),
-                      ],
+    return AnimatedBuilder(
+      animation: _micScaleAnimation,
+      child: GestureDetector(
+        onTap: _speechEnabled ? _toggleListening : _showSpeechUnavailable,
+        onLongPress: _speechEnabled ? _showVoiceHelp : null,
+        child: Container(
+          height: buttonHeight,
+          width: 50,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _isListening
+                  ? [Colors.red.withOpacity(0.8), Colors.red.withOpacity(0.6)]
+                  : _speechEnabled
+                  ? [
+                      AppColors.primaryColor.withOpacity(0.8),
+                      AppColors.textPurple.withOpacity(0.8),
+                    ]
+                  : [
+                      Colors.grey.withOpacity(0.5),
+                      Colors.grey.withOpacity(0.3),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0xFF0E0C12),
+                offset: Offset(4, 4),
+                blurRadius: 8,
               ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0xFF0E0C12),
-                  offset: Offset(4, 4),
-                  blurRadius: 8,
-                ),
-                BoxShadow(
-                  color: Color(0xFF18161E),
-                  offset: Offset(-4, -4),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _isListening ? Icons.mic : Icons.mic_none,
-                  color: Colors.white,
-                  size: isTablet ? 28 : 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  _isListening ? 'Stop' : (_speechEnabled ? 'Voice' : 'N/A'),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isTablet ? 18 : 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+              BoxShadow(
+                color: Color(0xFF18161E),
+                offset: Offset(-4, -4),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Icon(
+            _isListening ? Icons.mic : Icons.mic_none,
+            color: Colors.white,
+            size: isTablet ? 28 : 24,
           ),
         ),
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _isListening ? _micScaleAnimation.value : 1.0,
-            child: child,
-          );
-        },
       ),
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _isListening ? _micScaleAnimation.value : 1.0,
+          child: child,
+        );
+      },
     );
   }
 
