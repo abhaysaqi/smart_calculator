@@ -161,7 +161,13 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     );
 
     return Scaffold(
-      floatingActionButton: _buildVoiceButton(buttonHeight, screenWidth, false),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          _buildVoiceButton(buttonHeight, screenWidth, false),
+          SizedBox(height: displayHeight * 0.4),
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       body: SafeArea(
         child: Container(
@@ -614,8 +620,8 @@ class _CalculatorScreenState extends State<CalculatorScreen>
         onTap: _speechEnabled ? _toggleListening : _showSpeechUnavailable,
         onLongPress: _speechEnabled ? _showVoiceHelp : null,
         child: Container(
-          height: buttonHeight,
-          width: 50,
+          height: 40,
+          width: 40,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
