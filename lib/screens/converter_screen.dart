@@ -17,14 +17,30 @@ class _ConverterScreenState extends State<ConverterScreen> {
   final HistoryService _historyService = HistoryService();
 
   // Controllers - All set to '0' as default
-  final TextEditingController _currencyFromController = TextEditingController(text: '0');
-  final TextEditingController _currencyToController = TextEditingController(text: '0');
-  final TextEditingController _tempFromController = TextEditingController(text: '0');
-  final TextEditingController _tempToController = TextEditingController(text: '0');
-  final TextEditingController _lengthFromController = TextEditingController(text: '0');
-  final TextEditingController _lengthToController = TextEditingController(text: '0');
-  final TextEditingController _weightFromController = TextEditingController(text: '0'); // Changed from '5' to '0'
-  final TextEditingController _weightToController = TextEditingController(text: '0');
+  final TextEditingController _currencyFromController = TextEditingController(
+    text: '0',
+  );
+  final TextEditingController _currencyToController = TextEditingController(
+    text: '0',
+  );
+  final TextEditingController _tempFromController = TextEditingController(
+    text: '0',
+  );
+  final TextEditingController _tempToController = TextEditingController(
+    text: '0',
+  );
+  final TextEditingController _lengthFromController = TextEditingController(
+    text: '0',
+  );
+  final TextEditingController _lengthToController = TextEditingController(
+    text: '0',
+  );
+  final TextEditingController _weightFromController = TextEditingController(
+    text: '0',
+  ); // Changed from '5' to '0'
+  final TextEditingController _weightToController = TextEditingController(
+    text: '0',
+  );
 
   // Selected units
   String _currencyFrom = 'USD';
@@ -55,7 +71,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
       body: Container(
         decoration: const BoxDecoration(gradient: AppStyles.backgroundGradient),
         child: Container(
-          decoration: const BoxDecoration(gradient: AppStyles.containerGradient),
+          decoration: const BoxDecoration(
+            gradient: AppStyles.containerGradient,
+          ),
           child: Column(
             children: [
               CommonHeader(title: "Converter"),
@@ -67,7 +85,10 @@ class _ConverterScreenState extends State<ConverterScreen> {
                       const SizedBox(height: 24),
                       _buildSection('💰 Currency', _buildCurrencyConverter()),
                       const SizedBox(height: 24),
-                      _buildSection('🌡️ Temperature', _buildTemperatureConverter()),
+                      _buildSection(
+                        '🌡️ Temperature',
+                        _buildTemperatureConverter(),
+                      ),
                       const SizedBox(height: 24),
                       _buildSection('📏 Length', _buildLengthConverter()),
                       const SizedBox(height: 24),
@@ -362,12 +383,20 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertCurrency() {
     if (_currencyFromController.text.isNotEmpty) {
       double value = double.tryParse(_currencyFromController.text) ?? 0;
-      double result = _conversionService.convertCurrency(value, _currencyFrom, _currencyTo);
+      double result = _conversionService.convertCurrency(
+        value,
+        _currencyFrom,
+        _currencyTo,
+      );
       _currencyToController.text = _formatNumber(result);
-      
+
       // Only add to history if value is not 0 to avoid cluttering history
       if (value != 0) {
-        _addToHistory('$value $_currencyFrom to $_currencyTo', '${_formatNumber(result)} $_currencyTo', 'Currency');
+        _addToHistory(
+          '$value $_currencyFrom to $_currencyTo',
+          '${_formatNumber(result)} $_currencyTo',
+          'Currency',
+        );
       }
     }
   }
@@ -375,7 +404,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertCurrencyReverse() {
     if (_currencyToController.text.isNotEmpty) {
       double value = double.tryParse(_currencyToController.text) ?? 0;
-      double result = _conversionService.convertCurrency(value, _currencyTo, _currencyFrom);
+      double result = _conversionService.convertCurrency(
+        value,
+        _currencyTo,
+        _currencyFrom,
+      );
       _currencyFromController.text = _formatNumber(result);
     }
   }
@@ -383,12 +416,20 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertTemperature() {
     if (_tempFromController.text.isNotEmpty) {
       double value = double.tryParse(_tempFromController.text) ?? 0;
-      double result = _conversionService.convertTemperature(value, _tempFrom, _tempTo);
+      double result = _conversionService.convertTemperature(
+        value,
+        _tempFrom,
+        _tempTo,
+      );
       _tempToController.text = _formatNumber(result);
-      
+
       // Only add to history if meaningful conversion (not just 0)
-      if (value != 0 || (_tempFrom != _tempTo)) {
-        _addToHistory('$value$_tempFrom to $_tempTo', '${_formatNumber(result)}$_tempTo', 'Temperature');
+      if (value != 0 && (_tempFrom != _tempTo)) {
+        _addToHistory(
+          '$value$_tempFrom to $_tempTo',
+          '${_formatNumber(result)}$_tempTo',
+          'Temperature',
+        );
       }
     }
   }
@@ -396,7 +437,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertTemperatureReverse() {
     if (_tempToController.text.isNotEmpty) {
       double value = double.tryParse(_tempToController.text) ?? 0;
-      double result = _conversionService.convertTemperature(value, _tempTo, _tempFrom);
+      double result = _conversionService.convertTemperature(
+        value,
+        _tempTo,
+        _tempFrom,
+      );
       _tempFromController.text = _formatNumber(result);
     }
   }
@@ -404,12 +449,20 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertLength() {
     if (_lengthFromController.text.isNotEmpty) {
       double value = double.tryParse(_lengthFromController.text) ?? 0;
-      double result = _conversionService.convertLength(value, _lengthFrom, _lengthTo);
+      double result = _conversionService.convertLength(
+        value,
+        _lengthFrom,
+        _lengthTo,
+      );
       _lengthToController.text = _formatNumber(result);
-      
+
       // Only add to history if value is not 0
       if (value != 0) {
-        _addToHistory('$value $_lengthFrom to $_lengthTo', '${_formatNumber(result)} $_lengthTo', 'Length');
+        _addToHistory(
+          '$value $_lengthFrom to $_lengthTo',
+          '${_formatNumber(result)} $_lengthTo',
+          'Length',
+        );
       }
     }
   }
@@ -417,7 +470,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertLengthReverse() {
     if (_lengthToController.text.isNotEmpty) {
       double value = double.tryParse(_lengthToController.text) ?? 0;
-      double result = _conversionService.convertLength(value, _lengthTo, _lengthFrom);
+      double result = _conversionService.convertLength(
+        value,
+        _lengthTo,
+        _lengthFrom,
+      );
       _lengthFromController.text = _formatNumber(result);
     }
   }
@@ -425,12 +482,20 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertWeight() {
     if (_weightFromController.text.isNotEmpty) {
       double value = double.tryParse(_weightFromController.text) ?? 0;
-      double result = _conversionService.convertWeight(value, _weightFrom, _weightTo);
+      double result = _conversionService.convertWeight(
+        value,
+        _weightFrom,
+        _weightTo,
+      );
       _weightToController.text = _formatNumber(result);
-      
+
       // Only add to history if value is not 0
       if (value != 0) {
-        _addToHistory('$value $_weightFrom to $_weightTo', '${_formatNumber(result)} $_weightTo', 'Weight');
+        _addToHistory(
+          '$value $_weightFrom to $_weightTo',
+          '${_formatNumber(result)} $_weightTo',
+          'Weight',
+        );
       }
     }
   }
@@ -438,7 +503,11 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _convertWeightReverse() {
     if (_weightToController.text.isNotEmpty) {
       double value = double.tryParse(_weightToController.text) ?? 0;
-      double result = _conversionService.convertWeight(value, _weightTo, _weightFrom);
+      double result = _conversionService.convertWeight(
+        value,
+        _weightTo,
+        _weightFrom,
+      );
       _weightFromController.text = _formatNumber(result);
     }
   }
@@ -449,7 +518,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       String tempUnit = _currencyFrom;
       _currencyFrom = _currencyTo;
       _currencyTo = tempUnit;
-      
+
       String tempValue = _currencyFromController.text;
       _currencyFromController.text = _currencyToController.text;
       _currencyToController.text = tempValue;
@@ -461,7 +530,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       String tempUnit = _tempFrom;
       _tempFrom = _tempTo;
       _tempTo = tempUnit;
-      
+
       String tempValue = _tempFromController.text;
       _tempFromController.text = _tempToController.text;
       _tempToController.text = tempValue;
@@ -473,7 +542,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       String tempUnit = _lengthFrom;
       _lengthFrom = _lengthTo;
       _lengthTo = tempUnit;
-      
+
       String tempValue = _lengthFromController.text;
       _lengthFromController.text = _lengthToController.text;
       _lengthToController.text = tempValue;
@@ -485,7 +554,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       String tempUnit = _weightFrom;
       _weightFrom = _weightTo;
       _weightTo = tempUnit;
-      
+
       String tempValue = _weightFromController.text;
       _weightFromController.text = _weightToController.text;
       _weightToController.text = tempValue;
