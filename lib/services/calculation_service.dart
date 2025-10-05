@@ -15,17 +15,20 @@ class CalculationService {
         if (b != 0) return a / b;
         throw ArgumentError('Division by zero');
       case '%':
-        return a % b;
+        return (a / b) * 100;
       default:
         throw ArgumentError('Unknown operator: $operator');
     }
   }
-  
+
   String formatResult(double result) {
     if (result == result.toInt()) {
       return result.toInt().toString();
     } else {
-      return result.toStringAsFixed(8).replaceAll(RegExp(r'0*$'), '').replaceAll(RegExp(r'\.$'), '');
+      return result
+          .toStringAsFixed(8)
+          .replaceAll(RegExp(r'0*$'), '')
+          .replaceAll(RegExp(r'\.$'), '');
     }
   }
 }
