@@ -18,7 +18,7 @@ class CalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Neumorphic Calculator',
+      title: 'Calculator',
       theme: ThemeData(fontFamily: 'Inter', brightness: Brightness.dark),
       home: const MainApp(),
       debugShowCheckedModeBanner: false,

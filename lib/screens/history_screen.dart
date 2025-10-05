@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_calculator/utils/app_colors.dart';
+import 'package:smart_calculator/utils/app_strings.dart';
 import 'package:smart_calculator/utils/text_styles.dart';
 import 'package:smart_calculator/widgets/common_app_bar.dart';
 import '../services/history_service.dart';
@@ -38,7 +39,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       _applyFilters();
     } catch (e) {
       setState(() => _isLoading = false);
-      _showErrorSnackbar('Failed to load history');
+      _showErrorSnackbar(AppStrings.failedToLoadHistory);
     }
   }
 
@@ -68,18 +69,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppStyles.backgroundGradient),
+      body: SafeArea(
         child: Container(
           decoration: const BoxDecoration(
-            gradient: AppStyles.containerGradient,
+            gradient: AppStyles.backgroundGradient,
           ),
-          child: Column(
-            children: [
-              CommonHeader(title: "History"),
-              _buildSearchAndFilter(),
-              Expanded(child: _buildContent()),
-            ],
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: AppStyles.containerGradient,
+            ),
+            child: Column(
+              children: [
+                CommonHeader(title: AppStrings.history),
+                _buildSearchAndFilter(),
+                Expanded(child: _buildContent()),
+              ],
+            ),
           ),
         ),
       ),
@@ -251,7 +256,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               },
               style: const TextStyle(color: AppColors.textWhite),
               decoration: InputDecoration(
-                hintText: 'Search calculations...',
+                hintText: AppStrings.searchCalculations,
                 hintStyle: TextStyle(
                   color: AppColors.textWhite.withOpacity(0.5),
                 ),
@@ -269,12 +274,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                'All',
-                'Calculator',
-                'Currency',
-                'Temperature',
-                'Length',
-                'Weight',
+                AppStrings.all,
+                AppStrings.calculator,
+                AppStrings.currency,
+                AppStrings.temperature,
+                AppStrings.length,
+                AppStrings.weight,
               ].map((filter) => _buildFilterChip(filter)).toList(),
             ),
           ),
@@ -329,7 +334,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            'No calculations found',
+            AppStrings.noCalculationsFound,
             style: TextStyle(
               color: AppColors.textWhite.withOpacity(0.8),
               fontSize: 18,
@@ -350,7 +355,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${_history.length} calculations',
+            '${_history.length} ${AppStrings.calculations}',
             style: TextStyle(
               color: AppColors.textWhite.withOpacity(0.6),
               fontSize: 14,
@@ -371,7 +376,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Icon(Icons.clear_all, color: Colors.red, size: 16),
                   const SizedBox(width: 8),
                   const Text(
-                    'Clear All',
+                    AppStrings.clearAll,
                     style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ],
@@ -389,7 +394,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1820),
         title: const Text(
-          'Delete Calculation',
+          AppStrings.deleteCalculation,
           style: TextStyle(color: Colors.white),
         ),
         content: Text(
@@ -399,11 +404,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text(
+              AppStrings.delete,
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -416,26 +424,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1820),
         title: const Text(
-          'Clear All History',
+          AppStrings.clearAllHistory,
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          'This will permanently delete all calculations.',
+          AppStrings.clearAllHistoryMessage,
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text(AppStrings.cancel),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               await _historyService.clearHistory();
               _loadHistory();
-              _showSuccessSnackbar('History cleared');
+              _showSuccessSnackbar(AppStrings.historyCleared);
             },
-            child: const Text('Clear All', style: TextStyle(color: Colors.red)),
+            child: const Text(
+              AppStrings.clearAll,
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -463,26 +474,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ListTile(
               leading: const Icon(Icons.copy, color: AppColors.primaryColor),
               title: const Text(
-                'Copy Result',
+                AppStrings.copyResult,
                 style: TextStyle(color: Colors.white),
               ),
               onTap: () {
                 Navigator.pop(context);
                 Clipboard.setData(ClipboardData(text: item['result']));
-                _showSuccessSnackbar('Result copied');
+                _showSuccessSnackbar(AppStrings.resultCopied);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
               title: const Text(
-                'Delete',
+                AppStrings.delete,
                 style: TextStyle(color: Colors.white),
               ),
               onTap: () async {
                 Navigator.pop(context);
                 await _historyService.deleteCalculation(item['id']);
                 _loadHistory();
-                _showSuccessSnackbar('Calculation deleted');
+                _showSuccessSnackbar(AppStrings.calculationDeleted);
               },
             ),
           ],
@@ -512,10 +523,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
-    if (difference.inMinutes < 1) return 'Just now';
-    if (difference.inHours < 1) return '${difference.inMinutes}m ago';
-    if (difference.inDays < 1) return '${difference.inHours}h ago';
-    return '${difference.inDays}d ago';
+    if (difference.inMinutes < 1) return AppStrings.justNow;
+    if (difference.inHours < 1)
+      return '${difference.inMinutes}${AppStrings.minutesAgo}';
+    if (difference.inDays < 1)
+      return '${difference.inHours}${AppStrings.hoursAgo}';
+    return '${difference.inDays}${AppStrings.daysAgo}';
   }
 
   void _showSuccessSnackbar(String message) {

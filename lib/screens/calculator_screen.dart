@@ -180,7 +180,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
             child: Column(
               children: [
-                CommonHeader(title: "Calculator"),
+                CommonHeader(title: AppStrings.calculator),
                 _buildResponsiveDisplay(
                   screenSize,
                   isSmallScreen,
@@ -291,7 +291,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Listening...',
+                      AppStrings.listening,
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: 14,
@@ -324,9 +324,9 @@ class _CalculatorScreenState extends State<CalculatorScreen>
                     border: InputBorder.none,
                     hintText: _speechEnabled
                         ? (_isListening
-                              ? 'Listening for speech...'
-                              : 'Enter calculation or speak...')
-                        : 'Enter calculation...',
+                              ? AppStrings.listeningForSpeech
+                              : AppStrings.enterCalculationOrSpeak)
+                        : AppStrings.enterCalculation,
                     hintStyle: TextStyle(
                       color: AppColors.textWhite.withOpacity(0.3),
                       fontSize:
@@ -387,7 +387,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
 
   double _getResponsiveInputFontSize(Size screenSize, bool isTablet) {
     if (isTablet) return 28.0;
-    return math.max(18.0, math.min(24.0, screenSize.width * 0.055));
+    return math.max(18.0, math.min(24.0, screenSize.width * 0.062));
   }
 
   double _getResponsiveResultFontSize(
@@ -399,9 +399,9 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     final double previewSize = isTablet ? 24.0 : 18.0;
 
     if (isCalculated) {
-      return math.max(28.0, math.min(baseFontSize, screenSize.width * 0.08));
+      return math.max(28.0, math.min(baseFontSize, screenSize.width * 0.09));
     } else {
-      return math.max(16.0, math.min(previewSize, screenSize.width * 0.05));
+      return math.max(16.0, math.min(previewSize, screenSize.width * 0.06));
     }
   }
 
@@ -438,7 +438,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
               isTablet,
             ),
             _buildResponsiveButton(
-              "⌫",
+              AppStrings.remove,
               AppColors.textPurple,
               _backspace,
               buttonHeight,
@@ -756,7 +756,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
           // Handle clear command
           _clearAll();
           _stopListening();
-          _showSuccessMessage('Calculator cleared by voice');
+          _showSuccessMessage(AppStrings.calculatorClearedByVoice);
           return;
         }
 
@@ -785,12 +785,12 @@ class _CalculatorScreenState extends State<CalculatorScreen>
         _stopListening();
         // Only show user-friendly errors, not technical ones
         if (error.contains('permission')) {
-          _showSpeechError('Microphone permission required');
+          _showSpeechError(AppStrings.microphonePermissionRequired);
         } else if (error.contains('not available')) {
-          _showSpeechError('Speech recognition not available');
+          _showSpeechError(AppStrings.speechRecognitionNotAvailable);
         } else {
           // For other errors, just show a generic message
-          _showSpeechError('Speech recognition temporarily unavailable');
+          _showSpeechError(AppStrings.speechRecognitionUnavailable);
         }
       },
       onTimeout: () {
@@ -878,7 +878,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              '🎤 Voice Commands',
+              AppStrings.voiceCommands,
               style: const TextStyle(
                 color: AppColors.textWhite,
                 fontSize: 20,
@@ -906,7 +906,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              'Tip: Long press voice button to see this help',
+              AppStrings.voiceHelpTip,
               style: TextStyle(
                 color: AppColors.textWhite.withOpacity(0.6),
                 fontSize: 14,
@@ -923,7 +923,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
   void _showSpeechUnavailable() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Speech recognition not available'),
+        content: const Text(AppStrings.speechRecognitionNotAvailable),
         backgroundColor: Colors.orange,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -934,7 +934,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
   void _showSpeechError(String error) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Speech error: $error'),
+        content: Text('${AppStrings.speechError}$error'),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1030,7 +1030,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
         _historyService.addCalculation(
           _inputController.text,
           _currentResult,
-          'Calculator',
+          AppStrings.calculator,
         );
         HapticFeedback.mediumImpact();
       } catch (e) {
