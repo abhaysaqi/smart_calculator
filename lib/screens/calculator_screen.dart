@@ -85,7 +85,25 @@ class _CalculatorScreenState extends State<CalculatorScreen>
   void _evaluateLiveResult() {
     if (calculation.isNotEmpty && calculation.length > 1) {
       try {
-        if (_hasValidExpression(calculation)) {
+        // Check if expression ends with an operator
+        final operators = ['+', '−', '×', '÷', '-', '*', '/', '%'];
+        bool endsWithOperator = operators.contains(
+          calculation[calculation.length - 1],
+        );
+
+        if (endsWithOperator) {
+          // Remove the last operator and evaluate the partial expression
+          String partialExpression = calculation.substring(
+            0,
+            calculation.length - 1,
+          );
+          if (_hasValidExpression(partialExpression)) {
+            double resultValue = _evaluateExpression(partialExpression);
+            _currentResult = _formatResult(resultValue);
+          } else {
+            _currentResult = '0';
+          }
+        } else if (_hasValidExpression(calculation)) {
           double resultValue = _evaluateExpression(calculation);
           _currentResult = _formatResult(resultValue);
         } else {
@@ -100,7 +118,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
   }
 
   bool _hasValidExpression(String expression) {
-    final operators = ['+', '−', '×', '÷', '-', '*', '/'];
+    final operators = ['+', '−', '×', '÷', '-', '*', '/', '%'];
     bool hasOperator = false;
     bool hasNumberBeforeOperator = false;
     bool hasNumberAfterOperator = false;
@@ -112,8 +130,27 @@ class _CalculatorScreenState extends State<CalculatorScreen>
         if (i > 0 && _isNumeric(expression[i - 1])) {
           hasNumberBeforeOperator = true;
           hasOperator = true;
+
+          // Special handling for % - it can work with or without a number after
+          if (char == '%') {
+            // Check if there's a number after %
+            if (i + 1 < expression.length && _isNumeric(expression[i + 1])) {
+              // Continue to check for number after %
+              for (int j = i + 1; j < expression.length; j++) {
+                if (_isNumeric(expression[j])) {
+                  hasNumberAfterOperator = true;
+                  break;
+                } else if (expression[j] != '.') {
+                  break;
+                }
+              }
+            } else {
+              // % without number after is also valid (like 50% = 0.5)
+              hasNumberAfterOperator = true;
+            }
+          }
         }
-      } else if (_isNumeric(char) && hasOperator) {
+      } else if (_isNumeric(char) && hasOperator && !hasNumberAfterOperator) {
         hasNumberAfterOperator = true;
       }
     }
@@ -180,7 +217,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
             child: Column(
               children: [
-                CommonHeader(title: "Calculator"),
+                CommonHeader(title: AppStrings.calculator),
                 _buildResponsiveDisplay(
                   screenSize,
                   isSmallScreen,
@@ -291,7 +328,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Listening...',
+                      AppStrings.listening,
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: 14,
@@ -324,9 +361,9 @@ class _CalculatorScreenState extends State<CalculatorScreen>
                     border: InputBorder.none,
                     hintText: _speechEnabled
                         ? (_isListening
-                              ? 'Listening for speech...'
-                              : 'Enter calculation or speak...')
-                        : 'Enter calculation...',
+                              ? AppStrings.listeningForSpeech
+                              : AppStrings.enterCalculationOrSpeak)
+                        : AppStrings.enterCalculation,
                     hintStyle: TextStyle(
                       color: AppColors.textWhite.withOpacity(0.3),
                       fontSize:
@@ -387,7 +424,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
 
   double _getResponsiveInputFontSize(Size screenSize, bool isTablet) {
     if (isTablet) return 28.0;
-    return math.max(18.0, math.min(24.0, screenSize.width * 0.055));
+    return math.max(18.0, math.min(24.0, screenSize.width * 0.062));
   }
 
   double _getResponsiveResultFontSize(
@@ -399,9 +436,9 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     final double previewSize = isTablet ? 24.0 : 18.0;
 
     if (isCalculated) {
-      return math.max(28.0, math.min(baseFontSize, screenSize.width * 0.08));
+      return math.max(28.0, math.min(baseFontSize, screenSize.width * 0.09));
     } else {
-      return math.max(16.0, math.min(previewSize, screenSize.width * 0.05));
+      return math.max(16.0, math.min(previewSize, screenSize.width * 0.06));
     }
   }
 
@@ -438,7 +475,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
               isTablet,
             ),
             _buildResponsiveButton(
-              "⌫",
+              AppStrings.remove,
               AppColors.textPurple,
               _backspace,
               buttonHeight,
@@ -756,7 +793,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
           // Handle clear command
           _clearAll();
           _stopListening();
-          _showSuccessMessage('Calculator cleared by voice');
+          _showSuccessMessage(AppStrings.calculatorClearedByVoice);
           return;
         }
 
@@ -785,12 +822,12 @@ class _CalculatorScreenState extends State<CalculatorScreen>
         _stopListening();
         // Only show user-friendly errors, not technical ones
         if (error.contains('permission')) {
-          _showSpeechError('Microphone permission required');
+          _showSpeechError(AppStrings.microphonePermissionRequired);
         } else if (error.contains('not available')) {
-          _showSpeechError('Speech recognition not available');
+          _showSpeechError(AppStrings.speechRecognitionNotAvailable);
         } else {
           // For other errors, just show a generic message
-          _showSpeechError('Speech recognition temporarily unavailable');
+          _showSpeechError(AppStrings.speechRecognitionUnavailable);
         }
       },
       onTimeout: () {
@@ -878,7 +915,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              '🎤 Voice Commands',
+              AppStrings.voiceCommands,
               style: const TextStyle(
                 color: AppColors.textWhite,
                 fontSize: 20,
@@ -906,7 +943,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              'Tip: Long press voice button to see this help',
+              AppStrings.voiceHelpTip,
               style: TextStyle(
                 color: AppColors.textWhite.withOpacity(0.6),
                 fontSize: 14,
@@ -923,7 +960,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
   void _showSpeechUnavailable() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Speech recognition not available'),
+        content: const Text(AppStrings.speechRecognitionNotAvailable),
         backgroundColor: Colors.orange,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -934,7 +971,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
   void _showSpeechError(String error) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Speech error: $error'),
+        content: Text('${AppStrings.speechError}$error'),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1030,7 +1067,7 @@ class _CalculatorScreenState extends State<CalculatorScreen>
         _historyService.addCalculation(
           _inputController.text,
           _currentResult,
-          'Calculator',
+          AppStrings.calculator,
         );
         HapticFeedback.mediumImpact();
       } catch (e) {
@@ -1043,7 +1080,6 @@ class _CalculatorScreenState extends State<CalculatorScreen>
     }
   }
 
-  // Keep all your existing calculation methods...
   double _evaluateExpression(String expression) {
     try {
       expression = expression.replaceAll(' ', '');
@@ -1051,14 +1087,99 @@ class _CalculatorScreenState extends State<CalculatorScreen>
       expression = expression.replaceAll('÷', '/');
       expression = expression.replaceAll('−', '-');
 
-      if (expression.contains('%')) {
-        expression = expression.replaceAll('%', '/100');
-      }
+      // Handle percentage calculations BEFORE parsing
+      expression = _handlePercentageOperations(expression);
 
       return _parseExpression(expression);
     } catch (e) {
       throw Exception('Invalid expression');
     }
+  }
+
+  // NEW: Handle percentage operations correctly
+  String _handlePercentageOperations(String expression) {
+    while (expression.contains('%')) {
+      int percentIndex = expression.indexOf('%');
+
+      // Find the number before %
+      int leftStart = 0;
+      for (int i = percentIndex - 1; i >= 0; i--) {
+        if ('+-*/()'.contains(expression[i])) {
+          leftStart = i + 1;
+          break;
+        }
+      }
+
+      // Find the number after % (if any)
+      int rightEnd = expression.length;
+
+      // Check if there's a number after %
+      if (percentIndex + 1 < expression.length) {
+        int nextPos = percentIndex + 1;
+
+        // Check if next character is a digit or decimal point
+        if (nextPos < expression.length &&
+            ('0123456789.'.contains(expression[nextPos]))) {
+          // Find the end of the number after %
+          for (int i = nextPos; i < expression.length; i++) {
+            if ('+-*/()'.contains(expression[i])) {
+              rightEnd = i;
+              break;
+            }
+          }
+
+          // Handle the percentage calculation: A % B = (A * B) / 100
+          String leftStr = expression.substring(leftStart, percentIndex);
+          String rightStr = expression.substring(percentIndex + 1, rightEnd);
+
+          double leftValue = double.parse(leftStr);
+          double rightValue = double.parse(rightStr);
+
+          // Calculate: leftValue * (rightValue / 100)
+          // This gives us rightValue% of leftValue
+          double result = leftValue * (rightValue / 100);
+
+          // Replace the entire percentage operation with the result
+          expression = expression.replaceRange(
+            leftStart,
+            rightEnd,
+            result.toString(),
+          );
+
+          print(
+            '🧮 Percentage: $leftValue % $rightValue = $result ($rightValue% of $leftValue)',
+          );
+        } else {
+          // Just % without a number after it, treat as /100
+          String leftStr = expression.substring(leftStart, percentIndex);
+          double leftValue = double.parse(leftStr);
+          double result = leftValue / 100;
+
+          expression = expression.replaceRange(
+            leftStart,
+            percentIndex + 1,
+            result.toString(),
+          );
+
+          print('🧮 Simple percentage: $leftValue% = $result');
+        }
+      } else {
+        // % is at the end, treat as /100
+        String leftStr = expression.substring(leftStart, percentIndex);
+        double leftValue = double.parse(leftStr);
+        double result = leftValue / 100;
+
+        expression = expression.replaceRange(
+          leftStart,
+          percentIndex + 1,
+          result.toString(),
+        );
+
+        print('🧮 Simple percentage: $leftValue% = $result');
+      }
+    }
+
+    return expression;
   }
 
   double _parseExpression(String expression) {

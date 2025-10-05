@@ -12,7 +12,7 @@ class CommonHeader extends StatelessWidget {
     super.key,
     required this.title,
     this.onSettingsTap,
-    this.showSettings = true,
+    this.showSettings = false,
     this.backgroundColor,
     this.textColor,
     this.iconColor,
