@@ -1,4 +1,4 @@
-package com.example.smart_calculator
+package com.abhaydev.smart_calculator
 
 import io.flutter.embedding.android.FlutterActivity
 
